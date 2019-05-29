@@ -12,7 +12,7 @@ host = 'm.weibo.cn'
 base_url = 'https://%s/api/container/getIndex?' % host
 user_agent = 'User-Agent: Mozilla/5.0 (iPhone; CPU iPhone OS 9_1 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13B143 Safari/601.1 wechatdevtools/0.7.0 MicroMessenger/6.3.9 Language/zh_CN webview/0'
 
-user_id = str(5222241375)
+user_id = str(input("请输入待抓取微博用户ID："))  #str(5222241375)
 headers = {
     'Host': host,
     'Refer': 'https://m.weibo.cn/u/%s' % user_id,
@@ -89,31 +89,33 @@ currentRoot = os.getcwd()
 t = time.strftime('%Y-%m-%d', time.localtime())
 root = currentRoot+"\\photoWeibo"+t+"\\"
 
-if __name__ == '__main__':
-    base_data = {}
-    page = 0  # 页数
-    time_start = time.time()
-    try:
-        json = get_single_page(1)
-        # 微博主名称
-        screen_name = json.get('data').get('cards')[0].get(
-            'mblog').get('user').get('screen_name')
-        # 发送微博总条数(包括转发,转发的微博无法获取图片)
-        total = json.get('data').get('cardlistInfo').get('total')
-        # 图片下载路径建立
-        pic_filebagPath = root+screen_name
-        if os.path.exists(pic_filebagPath) == False:
-            os.makedirs(pic_filebagPath)
-            print("创建目录", pic_filebagPath, ",用来存储图片")
+#if __name__ == '__main__':
+base_data = {}
+page = 0  # 页数
+time_start = time.time()
+try:
+    json = get_single_page(1)
+    # 微博主名称
+    screen_name = json.get('data').get('cards')[0].get(
+        'mblog').get('user').get('screen_name')
+    # 发送微博总条数(包括转发,转发的微博无法获取图片)
+    total = json.get('data').get('cardlistInfo').get('total')
+    # 图片下载路径建立
+    pic_filebagPath = root+screen_name
+    if os.path.exists(pic_filebagPath) == False:
+        os.makedirs(pic_filebagPath)
+        print("创建目录", pic_filebagPath, ",用来存储图片")
 
-        page = total//10 if total % 10 == 0 else total//10+1
-        print('总页数为：%s' % page)
+    page = total//10 if total % 10 == 0 else total//10+1
+    print('总页数为：%s' % page)
 
-        for page in tqdm(range(0, page)):
-            json = get_single_page(page)
-            analysis_page(json, pic_filebagPath)
-    except Exception as e:
-        print('error:', e)
-    finally:
-        time_end = time.time()
-        print('\n totally cost', time_end-time_start)  # 显示程序运行时间
+    for page in tqdm(range(0, page)):
+        json = get_single_page(page)
+        analysis_page(json, pic_filebagPath)
+except Exception as e:
+    print('error:', e)
+finally:
+    time_end = time.time()
+    print('\n totally cost', time_end-time_start)  # 显示程序运行时间
+
+input("输入任意值结束程序：")
